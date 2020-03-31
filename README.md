@@ -32,3 +32,4 @@ CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec rspec
 # Test a file
 cat file | CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec ruby test.rb
 ```
+
