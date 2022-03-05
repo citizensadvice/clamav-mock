@@ -5,7 +5,7 @@ require "clamav/client"
 
 client = ClamAV::Client.new
 
-response = client.execute(ClamAV::Commands::InstreamCommand.new(STDIN))
+response = client.execute(ClamAV::Commands::InstreamCommand.new($stdin))
 
 if response == ClamAV::SuccessResponse.new("stream")
   puts "OK"

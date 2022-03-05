@@ -12,7 +12,6 @@ eicar = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
 
 current_id = 0
 
-# rubocop:disable Metrics/BlockLength
 loop do
   Thread.start(server.accept) do |client|
     # https://linux.die.net/man/8/clamd
@@ -22,9 +21,11 @@ loop do
       prefix = client.getc
       break if prefix.nil?
 
-      delimiter = if prefix == "z" then "\0"
-                  elsif prefix == "n" then "\n"
-                  else raise "unexpected message prefix #{prefix}"
+      delimiter = case prefix
+                  when "z" then "\0"
+                  when "n" then "\n"
+                  else
+                    raise "unexpected message prefix #{prefix}"
                   end
 
       command = ""
@@ -65,4 +66,3 @@ loop do
     client.close
   end
 end
-# rubocop:enable Metrics/BlockLength

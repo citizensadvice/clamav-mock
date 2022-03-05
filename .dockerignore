@@ -1,0 +1,4 @@
+.git*
+.github
+spec
+.byebug_history
