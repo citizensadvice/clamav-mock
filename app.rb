@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "socket"
+require "stringio"
 
 port = ENV["CLAMD_TCP_PORT"].to_i
 port = 3310 if port.zero?
@@ -44,17 +45,17 @@ loop do
       when "PING"
         client.write("#{session}PONG#{delimiter}")
       when "INSTREAM"
-        buff = ""
-        found = false
+        io = StringIO.new
+        stream_size = 0
         # Chunks are size, followed by the bytes + delimiter
         loop do
           size = client.read(4).unpack1("N")
           break if size.zero?
 
-          buff += client.read(size)
-          found = true if buff.include?(eicar)
-          buff = buff[-eicar.length - 1..] || buff
+          stream_size += size
+          io.write client.read(size)[0, [0, eicar.size - io.size].max]
         end
+        found = stream_size == eicar.size && io.string == eicar
         client.write(found ? "#{session}stream: Eicar-Test-Signature FOUND#{delimiter}" : "#{session}stream: OK#{delimiter}")
       end
 

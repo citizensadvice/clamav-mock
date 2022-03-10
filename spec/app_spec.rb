@@ -52,7 +52,7 @@ RSpec.describe "APP" do
 
   describe "a binary file" do
     it "returns ok" do
-      io = File.open("#{__dir__}/war_and_peace.epub", "r")
+      io = File.open("#{__dir__}/fixtures/war_and_peace.epub", "r")
       response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
       expect(response).to eq ClamAV::SuccessResponse.new("stream")
     end
@@ -72,19 +72,33 @@ RSpec.describe "APP" do
         expect(response).to be_kind_of ClamAV::VirusResponse
       end
     end
-  end
 
-  describe "in middle of string" do
-    it "returns virus" do
-      response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("foo#{EICAR}bar")))
-      expect(response).to be_kind_of ClamAV::VirusResponse
+    context "when in middle of string" do
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("foo#{EICAR}bar")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
     end
-  end
 
-  describe "across chunk boundaries" do
-    it "returns virus" do
-      response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("foo#{EICAR}bar"), 10))
-      expect(response).to be_kind_of ClamAV::VirusResponse
+    context "when at the start of a string" do
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("#{EICAR}bar")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "when at the end of a string" do
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("foo#{EICAR}")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "when across chunk boundaries" do
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR), 10))
+        expect(response).to be_kind_of ClamAV::VirusResponse
+      end
     end
   end
 
