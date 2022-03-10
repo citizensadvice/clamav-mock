@@ -16,19 +16,31 @@ Use `CLAMD_TCP_PORT` to customise the port.
 # Build and test
 
 ```bash
+# Run locally
+bundle install
+CLAMD_TCP_PORT=3310 CLAMD_TCP=localhost ruby app.rb
+
 # Docker
 docker build . -t local/clamav-mock
 docker run -d -p 3310:3310 local/clamav-mock
 
-# Or start locally
-CLAMD_TCP_PORT=3310 ruby app.rb
+# Tests - not included in docker container
+bundle exec rspec
 
-# Install locally
-bundle install
+# Test using existing instance
+START_CLAMD=false CLAMD_TCP_PORT=3310 CLAMD_TCP_HOST=localhost bundle exec rspec
 
-# rspec - run locally only, not included in the container
-CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec rspec
-
-# Test a file
+# Test rigs for checking a file against an existing host
 cat file | CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec ruby test.rb
 ```
+
+## TODO
+
+- [x] upgrade ruby version and dependencies
+- [ ] rspec shouldn't need app to be started
+- [ ] Better instructions in the readme
+- [ ] test different line terminations
+- [ ] add support for zipped files
+- [ ] github action for testing
+- [ ] maybe add a test for a python client as well
+- [ ] eicar should be entire file

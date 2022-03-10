@@ -5,5 +5,8 @@ inherit_gem:
 Metrics/BlockLength:
   Enabled: false
 
+RSpec/BeforeAfterAll:
+  Enabled: false
+
 RSpec/MultipleExpectations:
   Enabled: false
