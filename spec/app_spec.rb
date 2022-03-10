@@ -17,9 +17,20 @@ RSpec.describe "APP" do
 
   subject(:app) { ClamAV::Client.new }
 
+  let(:default_socket) { ClamAV::Client.new.resolve_default_socket }
+  let(:null_connection) { ClamAV::Connection.new(socket: default_socket, wrapper: ClamAV::Wrappers::NullTerminationWrapper.new) }
+
   describe "PING" do
     it "returns PONG" do
       expect(app.ping).to eq true
+    end
+
+    context "with alternate line termination" do
+      subject(:app) { ClamAV::Client.new(null_connection) }
+
+      it "returns PONG" do
+        expect(app.ping).to eq true
+      end
     end
   end
 
@@ -27,6 +38,15 @@ RSpec.describe "APP" do
     it "returns ok" do
       response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("some data")))
       expect(response).to eq ClamAV::SuccessResponse.new("stream")
+    end
+
+    context "with alternate line termination" do
+      subject(:app) { ClamAV::Client.new(null_connection) }
+
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("some data")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
     end
   end
 
@@ -42,6 +62,15 @@ RSpec.describe "APP" do
     it "returns virus" do
       response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR)))
       expect(response).to be_kind_of ClamAV::VirusResponse
+    end
+
+    context "with alternate line termination" do
+      subject(:app) { ClamAV::Client.new(null_connection) }
+
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR)))
+        expect(response).to be_kind_of ClamAV::VirusResponse
+      end
     end
   end
 

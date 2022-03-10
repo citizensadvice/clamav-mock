@@ -37,9 +37,9 @@ cat file | CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec ruby test.rb
 ## TODO
 
 - [x] upgrade ruby version and dependencies
-- [ ] rspec shouldn't need app to be started
-- [ ] Better instructions in the readme
-- [ ] test different line terminations
+- [x] rspec shouldn't need app to be started
+- [x] Better instructions in the readme
+- [x] test different line terminations
 - [ ] add support for zipped files
 - [ ] github action for testing
 - [ ] maybe add a test for a python client as well
