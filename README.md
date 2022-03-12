@@ -6,9 +6,9 @@ This acts as a drop-in replacement for [docker clamav/clamav](https://hub.docker
 
 The mock will respond to PING, INSTREAM and supports IDSESSION only.
 
-The mock will return an OK response for all files, except [eicar virus signature](https://www.eicar.org/?page_id=3950).
+The mock will return an OK response for all files, except the [eicar virus signature](https://www.eicar.org/?page_id=3950).
 
-Eicar signatures packaged into more exotic file types or in a file over 100kb will not be identified. This is just a mock.
+Eicar signatures packaged within more exotic file types or in a file over 100kb will not be identified. This is just a mock.
 
 # Running
 
@@ -30,7 +30,7 @@ docker run -p 3310:3310 local/clamav-mock
 # Test - will start and stop the mock on a free port
 bundle exec rspec
 
-# Test - test against an existing instance
+# Test against an existing running instance of clamav
 START_CLAMD=false CLAMD_TCP_PORT=3310 CLAMD_TCP_HOST=localhost bundle exec rspec
 
 # Start locally - use CLAMD_TCP_PORT to change the port.  Defaults to 3310

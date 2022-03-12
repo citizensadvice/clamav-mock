@@ -4,7 +4,6 @@
 require "socket"
 require "stringio"
 require "zip"
-require "debug"
 
 port = ENV["CLAMD_TCP_PORT"].to_i
 port = 3310 if port.zero?
