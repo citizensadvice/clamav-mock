@@ -12,7 +12,7 @@ Eicar signatures packaged into more exotic file types or in a file over 100kb wi
 
 # Running
 
-`docker run -p 3310:3310 public.ecr.aws/citizensadvice/clamav-mock`
+`docker run -p 3310:3310 public.ecr.aws/citizensadvice/clamav-mock:v1.1.0`
 
 Use `CLAMD_TCP_PORT` to customise the port.
 
