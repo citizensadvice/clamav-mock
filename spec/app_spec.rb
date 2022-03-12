@@ -3,6 +3,7 @@
 require "socket"
 require "clamav/client"
 require_relative "./backgrounded"
+require "debug"
 
 EICAR = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
 
@@ -58,10 +59,10 @@ RSpec.describe "APP" do
     end
   end
 
-  describe "eicar" do
+  describe "a text file containing the eicar string" do
     it "returns virus" do
       response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR)))
-      expect(response).to be_kind_of ClamAV::VirusResponse
+      expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
     end
 
     context "with alternate line termination" do
@@ -69,7 +70,7 @@ RSpec.describe "APP" do
 
       it "returns virus" do
         response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR)))
-        expect(response).to be_kind_of ClamAV::VirusResponse
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
       end
     end
 
@@ -94,10 +95,106 @@ RSpec.describe "APP" do
       end
     end
 
+    context "when padded with white space" do
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("#{EICAR}  ")))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Eicar-Signature")
+      end
+    end
+
+    context "when padded with white space to 127 characters" do
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR.ljust(127, " \t\r\n\x1a"))))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Eicar-Signature")
+      end
+    end
+
+    context "when padded with white space to beyond 128 characters" do
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR.ljust(129, " \t\r\n\x1a"))))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
     context "when across chunk boundaries" do
       it "returns virus" do
         response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(EICAR), 10))
-        expect(response).to be_kind_of ClamAV::VirusResponse
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
+      end
+    end
+  end
+
+  describe "a zip file" do
+    context "without a virus" do
+      it "returns ok" do
+        io = File.open("#{__dir__}/fixtures/ok.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with an encrypted zip (unreadable)" do
+      it "returns ok" do
+        io = File.open("#{__dir__}/fixtures/zip-with-encryption.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with an unsupported zip (unreadable)" do
+      it "returns ok" do
+        io = File.open("#{__dir__}/fixtures/zip-with-unsupported-compression.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with large zip (will not be read)" do
+      it "returns ok" do
+        io = File.open("#{__dir__}/fixtures/large-zip.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with an invalid zip" do
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("\x50\x4B\x03\x04foobar")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with a virus" do
+      it "returns virus" do
+        io = File.open("#{__dir__}/fixtures/eicar_com.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
+      end
+    end
+
+    context "with a zip within a zip with a virus" do
+      it "returns virus" do
+        io = File.open("#{__dir__}/fixtures/eicarcom2.zip", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
+      end
+    end
+  end
+
+  describe "word documents" do
+    context "without a virus" do
+      it "returns ok" do
+        io = File.open("#{__dir__}/fixtures/ok.docx", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "with the test virus" do
+      it "returns virus" do
+        io = File.open("#{__dir__}/fixtures/eicar.docx", "r")
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
       end
     end
   end
