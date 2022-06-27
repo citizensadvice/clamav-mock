@@ -5,7 +5,7 @@ require "socket"
 require "stringio"
 require "zip"
 
-port = ENV["CLAMD_TCP_PORT"].to_i
+port = ENV.fetch("CLAMD_TCP_PORT", nil).to_i
 port = 3310 if port.zero?
 
 EICAR = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'

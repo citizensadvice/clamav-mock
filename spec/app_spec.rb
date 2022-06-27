@@ -7,9 +7,9 @@ require "debug"
 
 EICAR = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
 
-unless ENV["START_CLAMD"] == "false"
+unless ENV.fetch("START_CLAMD", nil) == "false"
   ENV["CLAMD_TCP_HOST"] = ENV.fetch("CLAMD_TCP_HOST", "localhost")
-  ENV["CLAMD_TCP_PORT"] = ENV["CLAMD_TCP_PORT"] || Addrinfo.tcp("", 0).bind { |s| s.local_address.ip_port }.to_s
+  ENV["CLAMD_TCP_PORT"] = ENV.fetch("CLAMD_TCP_PORT", nil) || Addrinfo.tcp("", 0).bind { |s| s.local_address.ip_port }.to_s
 end
 
 RSpec.describe "APP" do
@@ -23,14 +23,14 @@ RSpec.describe "APP" do
 
   describe "PING" do
     it "returns PONG" do
-      expect(app.ping).to eq true
+      expect(app.ping).to be true
     end
 
     context "with alternate line termination" do
       subject(:app) { ClamAV::Client.new(null_connection) }
 
       it "returns PONG" do
-        expect(app.ping).to eq true
+        expect(app.ping).to be true
       end
     end
   end
@@ -201,7 +201,7 @@ RSpec.describe "APP" do
 
   describe "multiple submissions" do
     it "returns PONG" do
-      expect(app.ping).to eq true
+      expect(app.ping).to be true
       response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("some data")))
       expect(response).to eq ClamAV::SuccessResponse.new("stream")
     end

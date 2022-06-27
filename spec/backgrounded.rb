@@ -13,8 +13,8 @@ module Backgrounded
 
   class App
     def initialize
-      @port = ENV["CLAMD_TCP_PORT"]
-      @host = ENV["CLAMD_TCP_HOST"]
+      @port = ENV.fetch("CLAMD_TCP_PORT", nil)
+      @host = ENV.fetch("CLAMD_TCP_HOST", nil)
       start
       wait_for_port
     end
