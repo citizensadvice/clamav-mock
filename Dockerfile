@@ -1,4 +1,4 @@
-FROM ruby:3.1.2-alpine3.16 AS builder
+FROM ruby:3.4.2-alpine3.21 AS builder
 
 ENV APP_ROOT /app
 
@@ -13,7 +13,7 @@ RUN bundle config set --local without 'development' && \
 
 #################################################
 
-FROM ruby:3.1.2-alpine3.16
+FROM ruby:3.4.2-alpine3.21
 
 ENV APP_ROOT /app
 
