@@ -4,7 +4,7 @@ ENV APP_ROOT=/app
 
 #################################################
 
-FROM base as builder
+FROM base AS builder
 
 WORKDIR $APP_ROOT
 COPY Gemfile* $APP_ROOT

@@ -17,6 +17,8 @@ Eicar signatures packaged within more exotic file types or in a file over 100kb 
 > A local antivirus will remove the eicar "infected" files.
 > Therefore these test samples are stored in password protected zips
 > The password is `eicar`
+>
+> Use the guid.com test file if you want to test on a computer with a local antivirus
 
 # Running
 
