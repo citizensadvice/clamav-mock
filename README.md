@@ -14,11 +14,11 @@ The mock will return an OK response for all files, except:
 Eicar signatures packaged within more exotic file types or in a file over 100kb will not be identified. This is just a mock.
 
 > [!WARNING]
-> A local antivirus will remove the eicar "infected" files.
-> Therefore these test samples are stored in password protected zips
+> A local antivirus will remove any eicar "infected" files.
+> Therefore, these test samples are stored in password protected zips.
 > The password is `eicar`
 >
-> Use the guid.com test file if you want to test on a computer with a local antivirus
+> As an alternative, use the guid.com test file if you want to test on a computer with a local antivirus
 
 # Running
 
