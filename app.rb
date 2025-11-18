@@ -13,6 +13,8 @@ EICAR = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
 EICAR_REGEXP = /\A#{Regexp.escape(EICAR)}[ \t\n\r\x1a]{0,60}\z/
 EICAR_NAME = "Win.Test.EICAR_HDB-1"
 EICAR_LEGACY_NAME = "Eicar-Signature"
+GUID = /\A7d1cf87e-f733-49c8-98a6-31f44982bd74\s*\z/
+GUID_NAME = "CA.SAMPLE.GUID"
 ZIP_MAGIC = "\x50\x4B\x03\x04".b
 OLE_MAGIC = "\xD0\xCF\x11\xE0".b
 MAX_SIZE = 1024 * 100 # 100kb
@@ -36,12 +38,11 @@ class ScanIO < StringIO
   end
 
   def virus_name
-    return @virus_name unless @virus_name.nil?
-
-    @virus_name =
+    @virus_name ||=
       if zip?                           then zip_eicar
       elsif ole?                        then ole_eicar
       elsif string == EICAR             then EICAR_NAME
+      elsif GUID.match?(string)         then GUID_NAME
       elsif EICAR_REGEXP.match?(string) then EICAR_LEGACY_NAME
       else
         false

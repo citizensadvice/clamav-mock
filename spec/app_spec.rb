@@ -4,16 +4,31 @@ require "socket"
 require "clamav/client"
 require_relative "backgrounded"
 require "debug"
+require "zip"
 
 EICAR = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
+GUID = "7d1cf87e-f733-49c8-98a6-31f44982bd74"
 
 unless ENV.fetch("START_CLAMD", nil) == "false"
   ENV["CLAMD_TCP_HOST"] = ENV.fetch("CLAMD_TCP_HOST", "localhost")
   ENV["CLAMD_TCP_PORT"] = ENV.fetch("CLAMD_TCP_PORT", nil) || Addrinfo.tcp("", 0).bind { |s| s.local_address.ip_port }.to_s
 end
 
+# The samples are stored in password protected zips to prevent
+# a local virus checker removing them
+def unzip(path)
+  file = nil
+  decrypter = Zip::TraditionalDecrypter.new("eicar")
+  Zip::InputStream.open(path, decrypter:) do |input|
+    input.get_next_entry
+    file = StringIO.new(input.read, "rb")
+  end
+  file
+end
+
 RSpec.describe "APP" do
   extend Backgrounded
+
   background_app unless ENV["START_CLAMD"] == "false"
 
   subject(:app) { ClamAV::Client.new }
@@ -124,6 +139,36 @@ RSpec.describe "APP" do
     end
   end
 
+  describe "a text file containing the test guid" do
+    it "returns virus" do
+      response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(GUID)))
+      expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "CA.SAMPLE.GUID")
+    end
+
+    context "with alternate line termination" do
+      subject(:app) { ClamAV::Client.new(null_connection) }
+
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(GUID)))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "CA.SAMPLE.GUID")
+      end
+    end
+
+    context "when in middle of string" do
+      it "returns ok" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new("foo#{GUID}bar")))
+        expect(response).to eq ClamAV::SuccessResponse.new("stream")
+      end
+    end
+
+    context "when padded with white space" do
+      it "returns virus" do
+        response = app.execute(ClamAV::Commands::InstreamCommand.new(StringIO.new(GUID.ljust(127, " \t\r\n"))))
+        expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "CA.SAMPLE.GUID")
+      end
+    end
+  end
+
   describe "a zip file" do
     context "without a virus" do
       it "returns ok" do
@@ -166,7 +211,7 @@ RSpec.describe "APP" do
 
     context "with a virus" do
       it "returns virus" do
-        io = File.open("#{__dir__}/fixtures/eicar_com.zip", "r")
+        io = unzip(File.open("#{__dir__}/fixtures/password-protected-zip/eicar_com.zip.zip", "r"))
         response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
         expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
       end
@@ -174,7 +219,7 @@ RSpec.describe "APP" do
 
     context "with a zip within a zip with a virus" do
       it "returns virus" do
-        io = File.open("#{__dir__}/fixtures/eicarcom2.zip", "r")
+        io = unzip(File.open("#{__dir__}/fixtures/password-protected-zip/eicarcom2.zip.zip", "r"))
         response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
         expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
       end
@@ -192,7 +237,7 @@ RSpec.describe "APP" do
 
     context "with the test virus" do
       it "returns virus" do
-        io = File.open("#{__dir__}/fixtures/eicar.docx", "r")
+        io = unzip(File.open("#{__dir__}/fixtures/password-protected-zip/eicar.docx.zip", "r"))
         response = app.execute(ClamAV::Commands::InstreamCommand.new(io))
         expect(response).to have_attributes(class: ClamAV::VirusResponse, virus_name: "Win.Test.EICAR_HDB-1")
       end

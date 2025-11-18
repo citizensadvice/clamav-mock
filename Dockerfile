@@ -1,6 +1,10 @@
-FROM ruby:3.4.2-alpine3.21 AS builder
+FROM ruby:3.4.7-alpine3.22 AS base
 
-ENV APP_ROOT /app
+ENV APP_ROOT=/app
+
+#################################################
+
+FROM base as builder
 
 WORKDIR $APP_ROOT
 COPY Gemfile* $APP_ROOT
@@ -13,9 +17,7 @@ RUN bundle config set --local without 'development' && \
 
 #################################################
 
-FROM ruby:3.4.2-alpine3.21
-
-ENV APP_ROOT /app
+FROM base
 
 COPY --from=builder /usr/local/bundle/ /usr/local/bundle/
 

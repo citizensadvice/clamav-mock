@@ -1,18 +1,26 @@
 # Clamav mock
 
-Simple mock for Clamav.  Provides a lightweight docker image that mocks Clamav responses for the instream command.
+Simple mock for Clamav. Provides a lightweight docker image that mocks Clamav responses for the instream command.
 
 This acts as a drop-in replacement for [docker clamav/clamav](https://hub.docker.com/r/clamav/clamav) when used with, for example, the [Ruby gem clamav-client](https://rubygems.org/gems/clamav-client).
 
 The mock will respond to PING, INSTREAM and supports IDSESSION only.
 
-The mock will return an OK response for all files, except the [eicar virus signature](https://www.eicar.org/?page_id=3950).
+The mock will return an OK response for all files, except:
+
+- the [eicar virus signature](https://www.eicar.org/?page_id=3950)
+- a file containing only the text "7d1cf87e-f733-49c8-98a6-31f44982bd74"
 
 Eicar signatures packaged within more exotic file types or in a file over 100kb will not be identified. This is just a mock.
 
+> [!WARNING]
+> A local antivirus will remove the eicar "infected" files.
+> Therefore these test samples are stored in password protected zips
+> The password is `eicar`
+
 # Running
 
-`docker run -p 3310:3310 public.ecr.aws/citizensadvice/clamav-mock:v1.1.0`
+`docker run -p 3310:3310 public.ecr.aws/citizensadvice/clamav-mock`
 
 Use `CLAMD_TCP_PORT` to customise the port.
 
@@ -34,11 +42,14 @@ bundle exec rspec
 START_CLAMD=false CLAMD_TCP_PORT=3310 CLAMD_TCP_HOST=localhost bundle exec rspec
 
 # Start locally - use CLAMD_TCP_PORT to change the port.  Defaults to 3310
-bundle exec app
+bundle exec ruby app.rb
 
 # Start the real clamav using docker
 docker run -p 3310:3310 clamav/clamav
 
 # Test rig for checking a file against an existing running instance of clamav
 cat file | CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec ruby test.rb
+
+# Test rig for checking a password protected fixture against an existing running instance of clamav
+cat file | bundle exec ruby unzip.rb | CLAMD_TCP_HOST=localhost CLAMD_TCP_PORT=3310 bundle exec ruby test.rb
 ```
