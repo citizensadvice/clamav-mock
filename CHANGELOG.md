@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## V1.4.0
 
 - Test samples have been moved into password protected zips to protect them from a local antivirus
 - Added a test signature unique to the mock as an alternative to the eicar signature
