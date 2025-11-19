@@ -7,7 +7,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gem "rubyzip"
 
 group :development do
-  gem "citizens-advice-style", github: "citizensadvice/citizens-advice-style-ruby", tag: "v12.0.0"
+  gem "citizens-advice-style", github: "citizensadvice/citizens-advice-style-ruby", tag: "v12.1.0"
   gem "clamav-client"
   gem "debug"
   gem "rspec"
