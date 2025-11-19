@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    rebase-strategy: disabled
+    directory: '/'
+    schedule:
+      interval: weekly
+
+  # Docker
+  - package-ecosystem: docker
+    directory: '/'
+    rebase-strategy: disabled
+    schedule:
+      interval: weekly
+
+  # Ruby dependencies
+  - package-ecosystem: bundler
+    directory: '/'
+    rebase-strategy: disabled
+    schedule:
+      interval: weekly
