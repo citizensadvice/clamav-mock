@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## V1.3.0
+
+- Ruby and dependency updates
+
 ## V1.2.0
 
 - Also build an amd64 image
