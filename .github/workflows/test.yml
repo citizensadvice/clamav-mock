@@ -1,11 +1,9 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-ruby
 # https://github.com/ruby/setup-ruby
 
-name: Test and lint
+name: Run tests
 
-on:
-  pull_request:
-    branches: [main]
+on: workflow_call
 
 jobs:
   test:
@@ -18,7 +16,5 @@ jobs:
         uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f
         with:
           bundler-cache: true
-      - name: Run rubocop
-        run: bundle exec rubocop
       - name: Run tests
         run: bundle exec rspec

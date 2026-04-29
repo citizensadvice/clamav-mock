@@ -1,15 +1,6 @@
 name: Publish to ECR
 
-on:
-  workflow_run:
-    workflows: [test]
-    types:
-      - completed
-
-  push:
-    branches:
-      - main
-      - "[0-9]*"
+on: workflow_call
 
 jobs:
   publish:
