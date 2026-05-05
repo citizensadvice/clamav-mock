@@ -7,7 +7,6 @@ jobs:
     name: Publish image
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build and push to ECR
         uses: citizensadvice/build-and-push-action@206bf7dfb5d0201183fb0de81dc4913334c4527e
         with:
