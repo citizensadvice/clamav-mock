@@ -1,6 +1,6 @@
 name: Publish to ECR
 
-on: pull_request
+on: workflow_call
 
 jobs:
   publish:
