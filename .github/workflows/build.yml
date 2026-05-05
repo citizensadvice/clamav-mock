@@ -1,21 +1,13 @@
 name: Publish to ECR
 
-on:
-  workflow_run:
-    workflows: [test]
-    types:
-      - completed
-
-  push:
-    branches:
-      - main
-      - "[0-9]*"
+on: workflow_call
 
 jobs:
   publish:
     name: Publish image
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Build and push to ECR
         uses: citizensadvice/build-and-push-action@f75961b74f734f04e11b573306120c084ee9c941
         with:
@@ -25,3 +17,4 @@ jobs:
           repository_name: clamav-mock
           multiarch_build: 'enabled'
           auth_token: ${{ secrets.GITHUB_TOKEN }}
+          prod_image: true

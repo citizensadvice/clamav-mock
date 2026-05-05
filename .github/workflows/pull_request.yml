@@ -1,0 +1,13 @@
+name: Test
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Run linting
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    name: Run tests
+    uses: ./.github/workflows/test.yml

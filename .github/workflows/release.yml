@@ -1,0 +1,22 @@
+name: Build and publish to private ECR
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  lint:
+    name: Run linting
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    name: Run tests
+    uses: ./.github/workflows/test.yml
+
+  build:
+    name: Publish image
+    uses: ./.github/workflows/build.yml
+    needs: test
