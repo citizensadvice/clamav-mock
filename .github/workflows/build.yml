@@ -17,4 +17,3 @@ jobs:
           repository_name: clamav-mock
           multiarch_build: 'enabled'
           auth_token: ${{ secrets.GITHUB_TOKEN }}
-          prod_image: true
