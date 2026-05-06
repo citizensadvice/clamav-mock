@@ -1,10 +1,23 @@
-name: Publish to ECR
+name: Build and publish to public ECR
 
-on: workflow_call
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
 
 jobs:
-  publish:
-    name: Publish image
+  lint:
+    name: Run linting
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    name: Run tests
+    uses: ./.github/workflows/test.yml
+
+  build:
+    name: Build and publish image
     runs-on: ubuntu-22.04
     steps:
       - name: Build and push to ECR
@@ -16,3 +29,4 @@ jobs:
           repository_name: clamav-mock
           multiarch_build: 'enabled'
           auth_token: ${{ secrets.GITHUB_TOKEN }}
+    needs: test
