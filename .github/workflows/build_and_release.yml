@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Build and push to ECR
-        uses: citizensadvice/build-and-push-action@206bf7dfb5d0201183fb0de81dc4913334c4527e
+        uses: citizensadvice/build-and-push-action@ee9b56c48ba042c046398776b4bbab8af71ea7ba
         with:
           aws_access_key: ${{ secrets.PUBLIC_PUSH_ECR_AWS_KEY }}
           aws_secret_key: ${{ secrets.PUBLIC_PUSH_ECR_AWS_SECRET }}
