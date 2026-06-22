@@ -8,7 +8,7 @@ jobs:
     runs-on: runs-on,run-id=${{ github.run_id }},job=lint
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - uses: ruby/setup-ruby@0cb964fd540e0a24c900370abf38a33466142735
+      - uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74
         with:
           bundler-cache: true
       - run: bundle exec rubocop
