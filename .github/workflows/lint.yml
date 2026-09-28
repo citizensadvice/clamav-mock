@@ -7,7 +7,7 @@ jobs:
     name: Lint
     runs-on: runs-on,run-id=${{ github.run_id }},job=lint
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: ruby/setup-ruby@0cb964fd540e0a24c900370abf38a33466142735
         with:
           bundler-cache: true
