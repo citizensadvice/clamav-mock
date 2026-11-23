@@ -1,4 +1,4 @@
-FROM ruby:3.4.13-alpine3.23 AS base
+FROM ruby:4.0.0-alpine3.23 AS base
 
 ENV APP_ROOT=/app
 
